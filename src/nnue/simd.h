@@ -48,7 +48,7 @@ namespace Stockfish::Eval::NNUE::SIMD {
 #ifdef USE_AVX512
 using vec_t      = __m512i;
 using vec_i8_t   = __m256i;
-using psqt_vec_t = __m512i;
+using psqt_vec_t = __m256i;
 using vec_uint_t = __m512i;
     #define vec_load(a) _mm512_load_si512(a)
     #define vec_store(a, b) _mm512_store_si512(a, b)
@@ -63,11 +63,11 @@ using vec_uint_t = __m512i;
     #define vec_slli_16(a, b) _mm512_slli_epi16(a, b)
     // Inverse permuted at load time
     #define vec_packus_16(a, b) _mm512_packus_epi16(a, b)
-    #define vec_load_psqt(a) _mm512_load_si512(a)
-    #define vec_store_psqt(a, b) _mm512_store_si512(a, b)
-    #define vec_add_psqt_32(a, b) _mm512_add_epi32(a, b)
-    #define vec_sub_psqt_32(a, b) _mm512_sub_epi32(a, b)
-    #define vec_zero_psqt() _mm512_setzero_epi32()
+    #define vec_load_psqt(a) _mm256_load_si256(a)
+    #define vec_store_psqt(a, b) _mm256_store_si256(a, b)
+    #define vec_add_psqt_32(a, b) _mm256_add_epi32(a, b)
+    #define vec_sub_psqt_32(a, b) _mm256_sub_epi32(a, b)
+    #define vec_zero_psqt() _mm256_setzero_si256()
 
     #define NumRegistersSIMD 16
     #define MaxChunkSize 64

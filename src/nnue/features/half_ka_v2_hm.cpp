@@ -75,32 +75,29 @@ std::tuple<int, bool, int> HalfKAv2_hm::make_feature_bucket(Color           pers
 // Get layer stack bucket
 IndexType HalfKAv2_hm::make_layer_stack_bucket(const Position& pos) {
     static constexpr auto LayerStackBuckets = [] {
-        MultiArray<uint8_t, 3, 3, 5, 5> v{};
+        MultiArray<uint8_t, 3, 3, 2> v{};
         for (uint8_t us_rook = 0; us_rook <= 2; ++us_rook)
             for (uint8_t opp_rook = 0; opp_rook <= 2; ++opp_rook)
-                for (uint8_t us_knight_cannon = 0; us_knight_cannon <= 4; ++us_knight_cannon)
-                    for (uint8_t opp_knight_cannon = 0; opp_knight_cannon <= 4; ++opp_knight_cannon)
-                        v[us_rook][opp_rook][us_knight_cannon][opp_knight_cannon] = [&] {
-                            if (us_rook == opp_rook)
-                                return us_rook * 4
-                                     + int(us_knight_cannon + opp_knight_cannon >= 4) * 2
-                                     + int(us_knight_cannon == opp_knight_cannon);
-                            else if (us_rook == 2 && opp_rook == 1)
-                                return 12;
-                            else if (us_rook == 1 && opp_rook == 2)
-                                return 13;
-                            else if (us_rook > 0 && opp_rook == 0)
-                                return 14;
-                            else  // us_rook == 0 && opp_rook > 0
-                                return 15;
-                        }();
+                for (uint8_t eq_knight_cannon = 0; eq_knight_cannon <= 1; ++eq_knight_cannon)
+                    v[us_rook][opp_rook][eq_knight_cannon] = [&] {
+                        if (us_rook == opp_rook)
+                            return bool(us_rook) * 2 + eq_knight_cannon;
+                        else if (us_rook == 2 && opp_rook == 1)
+                            return 4;
+                        else if (us_rook == 1 && opp_rook == 2)
+                            return 5;
+                        else if (us_rook > 0 && opp_rook == 0)
+                            return 6;
+                        else  // us_rook == 0 && opp_rook > 0
+                            return 7;
+                    }();
         return v;
     }();
 
     Color us = pos.side_to_move();
     return LayerStackBuckets[pos.count<ROOK>(us)][pos.count<ROOK>(~us)]
-                            [pos.count<KNIGHT>(us) + pos.count<CANNON>(us)]
-                            [pos.count<KNIGHT>(~us) + pos.count<CANNON>(~us)];
+                            [pos.count<KNIGHT>(us) + pos.count<CANNON>(us)
+                             == pos.count<KNIGHT>(~us) + pos.count<CANNON>(~us)];
 }
 
 // Index of a feature for a given king position and another piece on some square
